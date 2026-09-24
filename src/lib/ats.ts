@@ -93,7 +93,7 @@ export function extractKeywords(job: string): Keyword[] {
   // 2) siglas e palavras em destaque (maiúsculas no original)
   const orig = job.match(/(?<![\p{L}\d])\p{Lu}[\p{L}\d+#.\-]+/gu) ?? [];
   const firstWords = new Set(
-    job.split(/[.\n:;!?•\-]\s*/).map((s) => s.trim().split(/\s+/)[0]),
+    job.split(/[.\n:;!?•\-]\s*/).map((s) => s.trim().split(/\s+/)[0] ?? ""),
   );
   for (const raw of orig) {
     const w = raw.replace(/[.\-]+$/, "");
@@ -113,7 +113,7 @@ export function extractKeywords(job: string): Keyword[] {
   freq.forEach((c, t) => c >= 2 && add(t, c));
   const bi = new Map<string, number>();
   for (let i = 0; i < toks.length - 1; i++) {
-    const [a, b] = [toks[i], toks[i + 1]];
+    const a = toks[i]!, b = toks[i + 1]!;
     if (STOPWORDS.has(a) || STOPWORDS.has(b) || a.length < 3 || b.length < 3) continue;
     const p = `${a} ${b}`;
     bi.set(p, (bi.get(p) ?? 0) + 1);
