@@ -30,7 +30,7 @@ function Analise() {
       setResume(d.resume ?? "");
     }
   }, []);
-  const ready = job.trim().length > 30 && resume.trim().length > 30 Sokol
+  const ready = job.trim().length > 30 && resume.trim().length > 30;
   const warning = (() => {
     const missingJob = job.trim().length <= 30;
     const missingResume = resume.trim().length <= 30;
@@ -74,7 +74,7 @@ function Analise() {
         <Button size="lg" className="rounded-xl px-10" disabled={!ready} onClick={submit}>
           <Sparkles className="mr-1 size-4" /> Analisar
         </Button>
-        {!ready && <p className="text-xs text-muted-foreground">Preencha os dois campos para continuar.</p>}
+        {warning && <p className="text-xs text-muted-foreground">{warning}</p>}
       </div>
     </main>
   );
