@@ -95,7 +95,8 @@ export function extractKeywords(job: string): Keyword[] {
   const firstWords = new Set(
     job.split(/[.\n:;!?•\-]\s*/).map((s) => s.trim().split(/\s+/)[0]),
   );
-  for (const w of orig) {
+  for (const raw of orig) {
+    const w = raw.replace(/[.\-]+$/, "");
     const n = normalize(w);
     if (STOPWORDS.has(n) || n.length < 2) continue;
     const isAcronym = /^[A-Z0-9+#.]{2,}$/.test(w) && w.length <= 6;
