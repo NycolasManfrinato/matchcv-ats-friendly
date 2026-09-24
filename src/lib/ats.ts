@@ -1,7 +1,7 @@
 // Motor de análise ATS — roda 100% no navegador, sem inventar conteúdo.
 
 const STOPWORDS = new Set(
-  `a o as os um uma uns umas de do da dos das em no na nos nas por pelo pela pelos pelas para pra com sem sob sobre entre ate apos e ou mas que se como mais menos muito muita muitos muitas ja nao sim seu sua seus suas nosso nossa nossos nossas voce voces ele ela eles elas isso isto esse essa este esta aquele aquela ser estar ter haver sera sao foi era sera tem temos terao possuir possui buscamos procuramos vaga vagas empresa time equipe area cargo candidato candidata pessoa pessoas profissional oportunidade requisitos requisito desejavel desejaveis diferencial diferenciais responsabilidades atividades beneficios beneficio conhecimento conhecimentos experiencia experiencias anos ano nivel bom boa otimo otima forte fortes capacidade habilidade habilidades etc dia dias trabalho trabalhar atuar atuacao junto junto parte todo toda todos todas cada qualquer onde quando qual quais tambem bem assim ainda so sempre the and or of to in for with on at by an be is are as we you our your will from this that have has it its us who can all any more work team role job years year experience knowledge skills strong good ability plus nice using use including within across other such well new`.split(
+  `a o as os um uma uns umas de do da dos das em no na nos nas por pelo pela pelos pelas para pra com sem sob sobre entre ate apos e ou mas que se como mais menos muito muita muitos muitas ja nao sim seu sua seus suas nosso nossa nossos nossas voce voces ele ela eles elas isso isto esse essa este esta aquele aquela ser estar ter haver sera sao foi era sera tem temos terao possuir possui buscamos procuramos vaga vagas empresa time equipe area cargo candidato candidata pessoa pessoas profissional oportunidade requisitos requisito desejavel desejaveis diferencial diferenciais responsabilidades atividades beneficios beneficio conhecimento conhecimentos experiencia experiencias anos ano nivel bom boa otimo otima forte fortes capacidade habilidade habilidades etc pleno senior junior estagio estagiario desenvolvedor desenvolvedora analista dia dias trabalho trabalhar atuar atuacao junto junto parte todo toda todos todas cada qualquer onde quando qual quais tambem bem assim ainda so sempre the and or of to in for with on at by an be is are as we you our your will from this that have has it its us who can all any more work team role job years year experience knowledge skills strong good ability plus nice using use including within across other such well new`.split(
     /\s+/,
   ),
 );
@@ -91,14 +91,14 @@ export function extractKeywords(job: string): Keyword[] {
   for (const k of Object.keys(EQUIVALENTS)) if (norm.includes(k)) add(k, 3);
 
   // 2) siglas e palavras em destaque (maiúsculas no original)
-  const orig = job.match(/\b[A-Z][A-Za-z0-9+#.]{1,}\b/g) ?? [];
+  const orig = job.match(/(?<![\p{L}\d])\p{Lu}[\p{L}\d+#.\-]+/gu) ?? [];
   const firstWords = new Set(
     job.split(/[.\n:;!?•\-]\s*/).map((s) => s.trim().split(/\s+/)[0]),
   );
   for (const w of orig) {
     const n = normalize(w);
     if (STOPWORDS.has(n) || n.length < 2) continue;
-    const isAcronym = /^[A-Z0-9+#.]{2,}$/.test(w);
+    const isAcronym = /^[A-Z0-9+#.]{2,}$/.test(w) && w.length <= 6;
     if (!isAcronym && firstWords.has(w)) continue;
     add(n, isAcronym ? 3 : 2);
   }
@@ -154,7 +154,7 @@ export function analyze(job: string, resume: string): Analysis {
     const variant = eq?.find((v) => containsPhrase(resumeStem, stemPhrase(v)));
     if (variant) {
       found.push(k);
-      replacements.push([variant, displayTerm(k.term, job)]);
+      if (!normalize(job).includes(normalize(variant))) replacements.push([variant, displayTerm(k.term, job)]);
     } else missing.push(k);
   }
 
